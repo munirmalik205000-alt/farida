@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -6,13 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { toast } from 'sonner';
 import { 
   Wallet, ArrowRightLeft, Smartphone, Tv, Lightbulb, ShoppingBag, 
   TrendingUp, Users, LogOut, DollarSign, Plus, History
 } from 'lucide-react';
+import WalletCards from '../components/WalletCards';
+import IncomeStats from '../components/IncomeStats';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -38,17 +38,7 @@ const UserDashboard = ({ user, token, onLogout }) => {
 
   const axiosConfig = { headers: { Authorization: `Bearer ${token}` } };
 
-  useEffect(() => {
-    fetchDashboard();
-    fetchTransactions();
-    fetchCommissions();
-    fetchDownline();
-    fetchProducts();
-    fetchOrders();
-    fetchFundRequests();
-  }, []);
-
-  const fetchDashboard = async () => {
+  const fetchDashboard = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/user/dashboard`, axiosConfig);
       setDashboard(response.data);
@@ -57,61 +47,71 @@ const UserDashboard = ({ user, token, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/transactions`, axiosConfig);
       setTransactions(response.data);
     } catch (error) {
       console.error('Failed to load transactions');
     }
-  };
+  }, [token]);
 
-  const fetchCommissions = async () => {
+  const fetchCommissions = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/mlm/commissions`, axiosConfig);
       setCommissions(response.data);
     } catch (error) {
       console.error('Failed to load commissions');
     }
-  };
+  }, [token]);
 
-  const fetchDownline = async () => {
+  const fetchDownline = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/mlm/downline`, axiosConfig);
       setDownline(response.data);
     } catch (error) {
       console.error('Failed to load downline');
     }
-  };
+  }, [token]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/products`);
       setProducts(response.data);
     } catch (error) {
       console.error('Failed to load products');
     }
-  };
+  }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/orders`, axiosConfig);
       setOrders(response.data);
     } catch (error) {
       console.error('Failed to load orders');
     }
-  };
+  }, [token]);
 
-  const fetchFundRequests = async () => {
+  const fetchFundRequests = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/wallet/fund-requests`, axiosConfig);
       setFundRequests(response.data);
     } catch (error) {
       console.error('Failed to load fund requests');
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchTransactions();
+    fetchCommissions();
+    fetchDownline();
+    fetchProducts();
+    fetchOrders();
+    fetchFundRequests();
+  }, [fetchDashboard, fetchTransactions, fetchCommissions, fetchDownline, fetchProducts, fetchOrders, fetchFundRequests]);
 
   const handleFundRequest = async (e) => {
     e.preventDefault();
@@ -206,96 +206,10 @@ const UserDashboard = ({ user, token, onLogout }) => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Wallet Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card 
-            className="relative overflow-hidden border-0 shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1774289123157-7c108ff96819?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1lc2glMjBncmFkaWVudCUyMGJhY2tncm91bmQlMjBibHVlJTIwZ3JlZW58ZW58MHx8fHwxNzc1MjQ1MDkyfDA&ixlib=rb-4.1.0&q=85')`,
-              backgroundSize: 'cover'
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 to-slate-900/80 backdrop-blur-xl"></div>
-            <CardHeader className="relative z-10">
-              <CardTitle className="text-white flex items-center gap-2">
-                <Wallet className="w-5 h-5" />
-                Main Wallet
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <p className="text-5xl font-black text-white tracking-tighter" style={{ fontFamily: 'Outfit, sans-serif' }} data-testid="main-wallet-balance">
-                ₹{dashboard?.main_wallet?.toFixed(2) || '0.00'}
-              </p>
-              <p className="text-sm text-emerald-300 mt-2">Used for recharges & bills</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="relative overflow-hidden border-0 shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1774289123157-7c108ff96819?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1lc2glMjBncmFkaWVudCUyMGJhY2tncm91bmQlMjBibHVlJTIwZ3JlZW58ZW58MHx8fHwxNzc1MjQ1MDkyfDA&ixlib=rb-4.1.0&q=85')`,
-              backgroundSize: 'cover'
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/90 to-green-700/80 backdrop-blur-xl"></div>
-            <CardHeader className="relative z-10">
-              <CardTitle className="text-white flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
-                E-Wallet
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <p className="text-5xl font-black text-white tracking-tighter" style={{ fontFamily: 'Outfit, sans-serif' }} data-testid="e-wallet-balance">
-                ₹{dashboard?.e_wallet?.toFixed(2) || '0.00'}
-              </p>
-              <p className="text-sm text-white/90 mt-2">Commissions & transfers</p>
-            </CardContent>
-          </Card>
-        </div>
+        <WalletCards dashboard={dashboard} />
 
         {/* Income Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="border border-blue-200 bg-blue-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-                Total Income
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-blue-900" data-testid="total-income">
-                ₹{dashboard?.total_income?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-blue-200 bg-blue-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
-                <DollarSign className="w-5 h-5 text-blue-600" />
-                Today's Income
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-blue-900" data-testid="today-income">
-                ₹{dashboard?.today_income?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-emerald-200 bg-emerald-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2 text-emerald-900">
-                <ShoppingBag className="w-5 h-5 text-emerald-600" />
-                Repurchase Income
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-emerald-900" data-testid="repurchase-income">
-                ₹{dashboard?.repurchase_income?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <IncomeStats dashboard={dashboard} />
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

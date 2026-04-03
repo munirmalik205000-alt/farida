@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -21,14 +21,7 @@ const AdminDashboard = ({ user, token, onLogout }) => {
 
   const axiosConfig = { headers: { Authorization: `Bearer ${token}` } };
 
-  useEffect(() => {
-    fetchDashboard();
-    fetchUsers();
-    fetchFundRequests();
-    fetchTransactions();
-  }, []);
-
-  const fetchDashboard = async () => {
+  const fetchDashboard = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/admin/dashboard`, axiosConfig);
       setDashboard(response.data);
@@ -37,34 +30,41 @@ const AdminDashboard = ({ user, token, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/admin/users`, axiosConfig);
       setUsers(response.data);
     } catch (error) {
       console.error('Failed to load users');
     }
-  };
+  }, [token]);
 
-  const fetchFundRequests = async () => {
+  const fetchFundRequests = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/admin/fund-requests`, axiosConfig);
       setFundRequests(response.data);
     } catch (error) {
       console.error('Failed to load fund requests');
     }
-  };
+  }, [token]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/admin/transactions`, axiosConfig);
       setTransactions(response.data);
     } catch (error) {
       console.error('Failed to load transactions');
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchUsers();
+    fetchFundRequests();
+    fetchTransactions();
+  }, [fetchDashboard, fetchUsers, fetchFundRequests, fetchTransactions]);
 
   const handleApproveFundRequest = async (requestId) => {
     try {
