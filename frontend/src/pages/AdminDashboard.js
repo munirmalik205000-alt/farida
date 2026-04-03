@@ -189,12 +189,12 @@ const AdminDashboard = ({ user, token, onLogout }) => {
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto">
-            <TabsTrigger value="dashboard" data-testid="admin-tab-dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="requests" data-testid="admin-tab-requests">
+          <TabsList className="grid w-full grid-cols-3 h-auto bg-white border-2 border-blue-200">
+            <TabsTrigger value="dashboard" data-testid="admin-tab-dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Overview</TabsTrigger>
+            <TabsTrigger value="requests" data-testid="admin-tab-requests" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               Fund Requests {pendingRequests.length > 0 && `(${pendingRequests.length})`}
             </TabsTrigger>
-            <TabsTrigger value="users" data-testid="admin-tab-users">Users</TabsTrigger>
+            <TabsTrigger value="users" data-testid="admin-tab-users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">

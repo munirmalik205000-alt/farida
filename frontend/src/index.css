@@ -57,22 +57,113 @@ code {
 /* Override any yellow/lime colors */
 .bg-yellow-50,
 .bg-yellow-100,
+.bg-yellow-200,
+.bg-yellow-300,
+.bg-yellow-400,
+.bg-yellow-500,
 .bg-lime-50,
-.bg-lime-100 {
+.bg-lime-100,
+.bg-lime-200 {
     background-color: rgb(239 246 255) !important;
 }
 
 .text-yellow-600,
 .text-yellow-700,
+.text-yellow-800,
 .text-yellow-900,
 .text-lime-600,
-.text-lime-700 {
-    color: rgb(37 99 235) !important;
+.text-lime-700,
+.text-lime-800,
+.text-lime-900 {
+    color: rgb(30 64 175) !important;
 }
 
 .border-yellow-200,
+.border-yellow-300,
 .border-lime-200 {
     border-color: rgb(191 219 254) !important;
+}
+
+/* Force remove yellow from any element */
+[style*="background-color: yellow"],
+[style*="background-color: rgb(255, 255, 0)"],
+[class*="yellow"],
+[class*="lime"] {
+    background-color: rgb(239 246 255) !important;
+    color: rgb(30 64 175) !important;
+}
+
+/* Force proper button and primary colors */
+button[class*="bg-primary"],
+.bg-primary {
+    background-color: rgb(37 99 235) !important;
+}
+
+/* Override tabs styling */
+[role="tablist"] {
+    background-color: white !important;
+}
+
+[role="tab"][data-state="active"] {
+    background-color: rgb(37 99 235) !important;
+    color: white !important;
+}
+
+[role="tab"][data-state="inactive"] {
+    background-color: white !important;
+    color: rgb(71 85 105) !important;
+}
+
+/* Card overrides */
+.card {
+    background-color: white !important;
+}
+
+/* Force white background on all card content */
+[class*="Card"],
+[class*="card"],
+div[class*="bg-"] {
+    background-color: white !important;
+}
+
+/* Keep specific colored cards */
+.bg-blue-50 {
+    background-color: rgb(239 246 255) !important;
+}
+
+.bg-blue-100 {
+    background-color: rgb(219 234 254) !important;
+}
+
+.bg-emerald-50 {
+    background-color: rgb(236 253 245) !important;
+}
+
+.bg-green-50 {
+    background-color: rgb(240 253 244) !important;
+}
+
+.bg-orange-50 {
+    background-color: rgb(255 247 237) !important;
+}
+
+/* Force wallet cards to keep their gradient backgrounds */
+[style*="background-image"][style*="unsplash"] {
+    /* Keep original background */
+}
+
+/* Override visual editor yellow highlighting */
+[data-visual-edits],
+[data-visual-edits] * {
+    background-color: inherit !important;
+}
+
+/* Strong override for content sections */
+section,
+main,
+article,
+[role="tabpanel"] {
+    background-color: transparent !important;
 }
 
 @layer base {

@@ -118,9 +118,9 @@ const AuthPage = ({ onLogin }) => {
           </div>
 
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login" data-testid="login-tab">Login</TabsTrigger>
-              <TabsTrigger value="signup" data-testid="signup-tab">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-white border-2 border-blue-200">
+              <TabsTrigger value="login" data-testid="login-tab" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Login</TabsTrigger>
+              <TabsTrigger value="signup" data-testid="signup-tab" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">

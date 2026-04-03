@@ -299,12 +299,12 @@ const UserDashboard = ({ user, token, onLogout }) => {
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto">
-            <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="wallet" data-testid="tab-wallet">Wallet</TabsTrigger>
-            <TabsTrigger value="recharge" data-testid="tab-recharge">Recharge</TabsTrigger>
-            <TabsTrigger value="ecommerce" data-testid="tab-ecommerce">E-commerce</TabsTrigger>
-            <TabsTrigger value="mlm" data-testid="tab-mlm">MLM</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto bg-white border-2 border-blue-200">
+            <TabsTrigger value="dashboard" data-testid="tab-dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Dashboard</TabsTrigger>
+            <TabsTrigger value="wallet" data-testid="tab-wallet" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Wallet</TabsTrigger>
+            <TabsTrigger value="recharge" data-testid="tab-recharge" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Recharge</TabsTrigger>
+            <TabsTrigger value="ecommerce" data-testid="tab-ecommerce" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">E-commerce</TabsTrigger>
+            <TabsTrigger value="mlm" data-testid="tab-mlm" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">MLM</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -315,8 +315,8 @@ const UserDashboard = ({ user, token, onLogout }) => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
-                    <div className="flex-1 p-4 bg-emerald-50 rounded-md border-2 border-emerald-200">
-                      <p className="text-3xl font-bold text-emerald-900 tracking-wider" data-testid="referral-code">
+                    <div className="flex-1 p-4 bg-blue-50 rounded-md border-2 border-blue-300">
+                      <p className="text-3xl font-bold text-blue-900 tracking-wider" data-testid="referral-code">
                         {user.referral_code}
                       </p>
                     </div>
