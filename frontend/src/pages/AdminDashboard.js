@@ -130,57 +130,57 @@ const AdminDashboard = ({ user, token, onLogout }) => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all">
+          <Card className="border border-blue-200 bg-blue-50 hover:shadow-lg hover:-translate-y-1 transition-all">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-slate-700">
+              <CardTitle className="text-base flex items-center gap-2 text-blue-900">
                 <Users className="w-5 h-5 text-blue-600" />
                 Total Users
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-black text-slate-900" data-testid="admin-total-users">
+              <p className="text-3xl font-black text-blue-900" data-testid="admin-total-users">
                 {dashboard?.total_users || 0}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all">
+          <Card className="border border-emerald-200 bg-emerald-50 hover:shadow-lg hover:-translate-y-1 transition-all">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-slate-700">
+              <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
                 <Wallet className="w-5 h-5 text-emerald-600" />
                 Total Main Wallet
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-black text-slate-900" data-testid="admin-total-main-wallet">
+              <p className="text-3xl font-black text-emerald-900" data-testid="admin-total-main-wallet">
                 ₹{dashboard?.main_wallet?.toFixed(2) || '0.00'}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all">
+          <Card className="border border-green-200 bg-green-50 hover:shadow-lg hover:-translate-y-1 transition-all">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-slate-700">
+              <CardTitle className="text-base flex items-center gap-2 text-green-900">
                 <DollarSign className="w-5 h-5 text-green-600" />
                 Total E-Wallet
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-black text-slate-900" data-testid="admin-total-e-wallet">
+              <p className="text-3xl font-black text-green-900" data-testid="admin-total-e-wallet">
                 ₹{dashboard?.e_wallet?.toFixed(2) || '0.00'}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all">
+          <Card className="border border-orange-200 bg-orange-50 hover:shadow-lg hover:-translate-y-1 transition-all">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-slate-700">
+              <CardTitle className="text-base flex items-center gap-2 text-orange-900">
                 <TrendingUp className="w-5 h-5 text-orange-600" />
                 Pending Requests
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-black text-slate-900" data-testid="admin-pending-requests">
+              <p className="text-3xl font-black text-orange-900" data-testid="admin-pending-requests">
                 {dashboard?.pending_fund_requests || 0}
               </p>
             </CardContent>
