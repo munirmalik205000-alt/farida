@@ -1,0 +1,122 @@
+{
+  "project_name": "Smartpay360",
+  "domain": "Fintech / E-wallet / Recharge / MLM E-commerce SaaS",
+  "theme": "Light",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) + Archetype 1 (Trust & Stability)",
+  "design_philosophy": "A modern, mobile-first fintech dashboard designed for rapid execution and clear data correlation. Uses E1's 'Control Room' grid layout for the dashboard to manage complex wallets, 20-level refer schemas, and recharges cleanly without cognitive overload. The primary visual tension comes from deep ocean blue (Trust) paired with vibrant emerald green (Performance/Money) against stark white backgrounds.",
+  "colors": {
+    "background": "#F8FAFC",
+    "foreground": "#020617",
+    "card": "#FFFFFF",
+    "card_foreground": "#0F172A",
+    "primary": "#059669",
+    "primary_foreground": "#FFFFFF",
+    "secondary": "#0F172A",
+    "secondary_foreground": "#FFFFFF",
+    "muted": "#F1F5F9",
+    "muted_foreground": "#64748B",
+    "accent": "#10B981",
+    "accent_foreground": "#FFFFFF",
+    "border": "#E2E8F0",
+    "ring": "#059669",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "destructive": "#EF4444"
+  },
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "Manrope",
+    "hierarchy_rules": {
+      "h1": "text-4xl sm:text-5xl font-bold tracking-tight text-secondary",
+      "h2": "text-2xl sm:text-3xl font-semibold tracking-tight text-secondary",
+      "h3": "text-xl sm:text-2xl font-medium tracking-tight text-secondary",
+      "h4": "text-lg sm:text-xl font-medium tracking-tight text-secondary",
+      "body": "text-base font-normal text-foreground leading-relaxed",
+      "small_label": "text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground",
+      "wallet_balance": "text-5xl font-black tracking-tighter text-secondary"
+    },
+    "general_rules": "Do NOT use Inter for headings. Use Outfit for high-impact numbers and headings. Apply 'tracking-tight' for all headings above 32px. Use 'font-black' for wallet balances."
+  },
+  "layout_and_spacing": {
+    "spacing_scale": "Use generous padding: p-4, p-6 for mobile, p-8, p-12 for desktop containers.",
+    "dashboard_grid": "MODE B: The 'Control Room' Grid. grid-cols-1 md:grid-cols-3 lg:grid-cols-4. Gap strategy: gap-4 or gap-6. Every pixel utilized. Main charts/tables take col-span-2 or 3. Wallet summary takes col-span-1.",
+    "container_borders": "Containers with borders must have internal padding (p-6) to prevent text collision.",
+    "alignment": "Mobile-First. Start with grid-cols-1. Left-align dense content/labels. Center-align only for empty states or success messages."
+  },
+  "surfaces_and_micro_themes": {
+    "wallet_cards": "Glassmorphism over abstract mesh gradient. Use bg-black/60 (or dark blue), backdrop-blur-xl, backdrop-saturate-150, border-white/20, text-white. Drop shadow: shadow-[0_8px_32px_rgba(0,0,0,0.12)].",
+    "dashboard_widgets": "Flat solid background (bg-card), sharp 1px border (border-border), no shadow by default. On hover: shadow-lg, -translate-y-1.",
+    "headers": "Crystal Glass sticky header. bg-white/70, backdrop-blur-xl, border-b border-border/40.",
+    "buttons": "Primary buttons: bg-primary text-primary-foreground hover:bg-primary/90 rounded-md. Secondary buttons: outline border-border hover:bg-muted."
+  },
+  "components": {
+    "navigation": "Bottom Navigation for Mobile (sticky, icon + label). Sidebar for Admin/Desktop (collapsible, grouping features like Recharges, Ecommerce, Referrals).",
+    "forms_and_auth": "Use Shadcn Form, Input, Select. Left-aligned labels. Use clear active/focus rings (ring-primary). Referral Code input should have a distinct 'gift/invite' icon inside.",
+    "wallet_transfer": "Step-by-step or single-page wizard using Shadcn Dialog or Card. Display current balance prominently. Use 'lucide-react' arrow-right-left for transfer indication.",
+    "mlm_tree": "20-Level User Plan needs to be rendered as an expandable Accordion or nested list, avoiding visual clutter. Show User Avatar, Name, Level, and Commission.",
+    "tables": "Shadcn Table for Transfer History, User Details, and Fund Request Approvals. High contrast headers. Action buttons inside rows (Approve/Reject).",
+    "icons": "lucide-react for all standard icons. Phosphor icons for dense data viz if needed."
+  },
+  "pages": {
+    "auth": {
+      "description": "Login and Signup (Refer code, full name, mobile, password).",
+      "layout": "Split screen on desktop (left: mesh gradient with brand logo, right: form). Full screen form on mobile."
+    },
+    "user_dashboard": {
+      "description": "Main hub for the user.",
+      "sections": [
+        "Wallet Summary (Main Wallet & E-Wallet) - Visual cards.",
+        "Quick Actions (Add Fund, Transfer to E-wallet, Mobile/DTH/Utility Recharge).",
+        "Income Stats (Total Income, Today Income, Repurchase Income) - Bento grid cards.",
+        "Recent Transactions List."
+      ]
+    },
+    "admin_dashboard": {
+      "description": "Command center for the platform admin.",
+      "sections": [
+        "System Overview (Total Users, Total Main Wallet, Total E-Wallet).",
+        "Pending Fund Requests (Approve/Reject Table).",
+        "Transfer & Transaction History (Searchable/Sortable Table).",
+        "User Management (View user details, downlines)."
+      ]
+    },
+    "mlm_ecommerce": {
+      "description": "E-commerce product listing and 20-Level tracking.",
+      "layout": "Grid of products (col-span-1 for each). Level status in a dedicated tab or sidebar showing commission tracking."
+    }
+  },
+  "media_and_assets": {
+    "logo_strategy": "Combine Phosphor/Lucide 'Wallet' and 'Zap' (lightning bolt) icons with 'SmartPay360' text in Outfit font. Font color text-secondary, icons in text-primary.",
+    "images": [
+      {
+        "category": "auth_background",
+        "url": "https://images.unsplash.com/photo-1774289123157-7c108ff96819?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1lc2glMjBncmFkaWVudCUyMGJhY2tncm91bmQlMjBibHVlJTIwZ3JlZW58ZW58MHx8fHwxNzc1MjQ1MDkyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract mesh gradient background in blue and green, to be used on the Login/Signup split screen or as E-Wallet Card backgrounds."
+      },
+      {
+        "category": "user_avatar_placeholder_1",
+        "url": "https://images.unsplash.com/photo-1576558656222-ba66febe3dec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwzfHxzbWlsaW5nJTIwcHJvZmVzc2lvbmFsJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzc1MjQ1MDc2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional smiling man, to be used for User avatars in Admin User Details or downline lists."
+      },
+      {
+        "category": "user_avatar_placeholder_2",
+        "url": "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Professional smiling woman, to be used for User avatars in downline lists."
+      }
+    ]
+  },
+  "testing": {
+    "attributes": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case (e.g., data-testid='login-submit-button', data-testid='main-wallet-balance')."
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the color palette provided. Do not use generic tailwind slate/blue; map the CSS variables directly.",
+    "Install and use Outfit for headings and Manrope for body text.",
+    "Build Shadcn components but strip overly rounded borders (use rounded-md) to align with the 'Technical/Control Room' E1 strategy.",
+    "Implement Mobile-first views. Navigation must shift from Sidebar (Desktop) to Bottom Nav (Mobile).",
+    "Never use fully transparent backgrounds behind text over the auth_background image; always use the specified Glassmorphism rules.",
+    "Do NOT use Space Grotesk font. Use Outfit.",
+    "For the E-Wallet and Main Wallet displays, style them like digital credit cards with the mesh gradient image behind.",
+    "Ensure the Admin and User dashboards have distinct toggles or routes.",
+    "When building the MLM tree/20-level refer code, use Accordions with clear Avatar placeholders."
+  ]
+}
