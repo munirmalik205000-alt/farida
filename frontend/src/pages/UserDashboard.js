@@ -321,9 +321,30 @@ const UserDashboard = ({ user, token, onLogout }) => {
                       </p>
                     </div>
                     <Button 
-                      onClick={() => {
-                        navigator.clipboard.writeText(user.referral_code);
-                        toast.success('Referral code copied!');
+                      onClick={async () => {
+                        try {
+                          if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(user.referral_code);
+                            toast.success('Referral code copied!');
+                          } else {
+                            const textArea = document.createElement('textarea');
+                            textArea.value = user.referral_code;
+                            textArea.style.position = 'fixed';
+                            textArea.style.left = '-999999px';
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            try {
+                              document.execCommand('copy');
+                              toast.success('Referral code copied!');
+                            } catch (err) {
+                              toast.info(`Code: ${user.referral_code}`);
+                            }
+                            document.body.removeChild(textArea);
+                          }
+                        } catch (err) {
+                          toast.info(`Your referral code: ${user.referral_code}`);
+                        }
                       }}
                       data-testid="copy-referral-button"
                     >
