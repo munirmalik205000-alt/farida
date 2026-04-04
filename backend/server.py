@@ -77,6 +77,8 @@ class UserResponse(BaseModel):
     level: int
     main_wallet: float
     e_wallet: float
+    coins: int = 0
+    is_activated: bool = False
     is_admin: bool
     created_at: str
 
@@ -121,6 +123,7 @@ class RechargeRequest(BaseModel):
     number: str
     amount: float
     operator: Optional[str] = None
+    use_coins: bool = False
 
 class RechargeResponse(BaseModel):
     id: str
@@ -159,6 +162,29 @@ class CommissionResponse(BaseModel):
     type: str
     created_at: str
 
+class PackageCreate(BaseModel):
+    name: str
+    price: float
+    coins: int
+    image: str
+    description: Optional[str] = None
+
+class PackageResponse(BaseModel):
+    id: str
+    name: str
+    price: float
+    coins: int
+    image: str
+    description: Optional[str] = None
+    is_active: bool
+    created_at: str
+
+class SettingsResponse(BaseModel):
+    coin_usage_percentage: float
+
+class SettingsUpdate(BaseModel):
+    coin_usage_percentage: float
+
 class DashboardStats(BaseModel):
     total_income: float
     today_income: float
@@ -193,6 +219,8 @@ async def signup(req: SignupRequest):
         'level': referrer['level'] + 1,
         'main_wallet': 0.0,
         'e_wallet': 0.0,
+        'coins': 0,
+        'is_activated': False,
         'is_admin': False,
         'created_at': datetime.now(timezone.utc).isoformat()
     }
@@ -306,12 +334,30 @@ async def get_user_transactions(current_user: dict = Depends(get_current_user)):
 
 @api_router.post('/recharge', response_model=RechargeResponse)
 async def create_recharge(req: RechargeRequest, current_user: dict = Depends(get_current_user)):
-    if current_user['main_wallet'] < req.amount:
+    final_amount = req.amount
+    coins_used = 0
+    
+    if req.use_coins and current_user.get('coins', 0) > 0:
+        settings = await db.settings.find_one({}, {'_id': 0})
+        coin_percentage = settings.get('coin_usage_percentage', 10.0) if settings else 10.0
+        
+        max_coin_value = req.amount * (coin_percentage / 100)
+        coins_available = current_user['coins']
+        coins_used = min(coins_available, int(max_coin_value))
+        
+        final_amount = req.amount - coins_used
+        
+        await db.users.update_one(
+            {'id': current_user['id']},
+            {'$inc': {'coins': -coins_used}}
+        )
+    
+    if current_user['main_wallet'] < final_amount:
         raise HTTPException(status_code=400, detail='Insufficient Main Wallet balance')
     
     await db.users.update_one(
         {'id': current_user['id']},
-        {'$inc': {'main_wallet': -req.amount}}
+        {'$inc': {'main_wallet': -final_amount}}
     )
     
     recharge_id = str(uuid.uuid4())
@@ -321,12 +367,18 @@ async def create_recharge(req: RechargeRequest, current_user: dict = Depends(get
         'service_type': req.service_type,
         'number': req.number,
         'amount': req.amount,
+        'coins_used': coins_used,
+        'final_amount': final_amount,
         'operator': req.operator,
         'status': 'success',
         'created_at': datetime.now(timezone.utc).isoformat()
     }
     
     await db.recharge_history.insert_one(recharge_doc)
+    
+    description = f'{req.service_type} recharge for {req.number}'
+    if coins_used > 0:
+        description += f' (Used {coins_used} coins)'
     
     transaction_doc = {
         'id': str(uuid.uuid4()),
@@ -337,7 +389,7 @@ async def create_recharge(req: RechargeRequest, current_user: dict = Depends(get
         'from_wallet': 'main_wallet',
         'to_wallet': None,
         'status': 'completed',
-        'description': f'{req.service_type} recharge for {req.number}',
+        'description': description,
         'created_at': datetime.now(timezone.utc).isoformat()
     }
     
@@ -570,6 +622,95 @@ async def get_all_transactions(current_user: dict = Depends(get_current_user)):
     transactions = await db.transactions.find({}, {'_id': 0}).sort('created_at', -1).to_list(100)
     return transactions
 
+# Package Management
+@api_router.post('/admin/packages', response_model=PackageResponse)
+async def create_package(req: PackageCreate, current_user: dict = Depends(get_current_user)):
+    if not current_user.get('is_admin'):
+        raise HTTPException(status_code=403, detail='Admin access required')
+    
+    package_id = str(uuid.uuid4())
+    package_doc = {
+        'id': package_id,
+        'name': req.name,
+        'price': req.price,
+        'coins': req.coins,
+        'image': req.image,
+        'description': req.description,
+        'is_active': True,
+        'created_at': datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.packages.insert_one(package_doc)
+    return package_doc
+
+@api_router.get('/packages', response_model=List[PackageResponse])
+async def get_packages():
+    packages = await db.packages.find({'is_active': True}, {'_id': 0}).to_list(None)
+    return packages
+
+@api_router.post('/packages/{package_id}/purchase')
+async def purchase_package(package_id: str, current_user: dict = Depends(get_current_user)):
+    package = await db.packages.find_one({'id': package_id, 'is_active': True}, {'_id': 0})
+    if not package:
+        raise HTTPException(status_code=404, detail='Package not found')
+    
+    if current_user['main_wallet'] < package['price']:
+        raise HTTPException(status_code=400, detail='Insufficient wallet balance')
+    
+    await db.users.update_one(
+        {'id': current_user['id']},
+        {
+            '$inc': {
+                'main_wallet': -package['price'],
+                'coins': package['coins']
+            },
+            '$set': {'is_activated': True}
+        }
+    )
+    
+    transaction_doc = {
+        'id': str(uuid.uuid4()),
+        'user_id': current_user['id'],
+        'user_name': current_user['full_name'],
+        'type': 'package_purchase',
+        'amount': package['price'],
+        'from_wallet': 'main_wallet',
+        'to_wallet': None,
+        'status': 'completed',
+        'description': f'Purchased {package["name"]} package',
+        'created_at': datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.transactions.insert_one(transaction_doc)
+    
+    return {'message': 'Package purchased successfully', 'coins_awarded': package['coins']}
+
+# Settings Management
+@api_router.get('/admin/settings', response_model=SettingsResponse)
+async def get_settings(current_user: dict = Depends(get_current_user)):
+    if not current_user.get('is_admin'):
+        raise HTTPException(status_code=403, detail='Admin access required')
+    
+    settings = await db.settings.find_one({}, {'_id': 0})
+    if not settings:
+        settings = {'coin_usage_percentage': 10.0}
+        await db.settings.insert_one(settings)
+    
+    return settings
+
+@api_router.post('/admin/settings')
+async def update_settings(req: SettingsUpdate, current_user: dict = Depends(get_current_user)):
+    if not current_user.get('is_admin'):
+        raise HTTPException(status_code=403, detail='Admin access required')
+    
+    await db.settings.update_one(
+        {},
+        {'$set': {'coin_usage_percentage': req.coin_usage_percentage}},
+        upsert=True
+    )
+    
+    return {'message': 'Settings updated successfully'}
+
 @api_router.post('/admin/seed-data')
 async def seed_data():
     admin_exists = await db.users.find_one({'is_admin': True})
@@ -587,6 +728,8 @@ async def seed_data():
         'level': 0,
         'main_wallet': 10000.0,
         'e_wallet': 5000.0,
+        'coins': 1000,
+        'is_activated': True,
         'is_admin': True,
         'created_at': datetime.now(timezone.utc).isoformat()
     }
