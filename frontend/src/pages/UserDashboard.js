@@ -210,12 +210,12 @@ const UserDashboard = ({ user, token, onLogout }) => {
           </div>
         </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Wallet Cards */}
-        <WalletCards dashboard={dashboard} />
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Wallet Cards */}
+          <WalletCards dashboard={dashboard} />
 
-        {/* Income Stats */}
-        <IncomeStats dashboard={dashboard} />
+          {/* Income Stats */}
+          <IncomeStats dashboard={dashboard} />
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -591,6 +591,7 @@ const UserDashboard = ({ user, token, onLogout }) => {
             </div>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   );
