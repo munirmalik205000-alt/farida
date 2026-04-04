@@ -8,6 +8,9 @@ import {
   Users, DollarSign, LogOut, CheckCircle, XCircle, 
   TrendingUp, Wallet, History, Shield
 } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import AdminPackages from '../components/AdminPackages';
+import AdminSettings from '../components/AdminSettings';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -101,103 +104,95 @@ const AdminDashboard = ({ user, token, onLogout }) => {
   const pendingRequests = fundRequests.filter(req => req.status === 'pending');
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-emerald-600" />
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                Admin Panel
-              </h1>
-              <p className="text-xs text-slate-600">Smartpay360 Management</p>
+    <div className="min-h-screen bg-slate-50 flex">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} userType="admin" />
+      
+      <div className="flex-1 md:ml-64">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-slate-200/40">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Shield className="w-8 h-8 text-purple-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Admin Panel
+                </h1>
+                <p className="text-xs text-slate-500">Smartpay360 Management</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden md:block">
+                <p className="text-sm text-slate-600">{user.full_name}</p>
+                <p className="text-xs text-purple-600 font-medium">Administrator</p>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden md:block">
-              <p className="text-sm text-slate-600">{user.full_name}</p>
-              <p className="text-xs text-emerald-600 font-medium">Administrator</p>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Stats Grid - Only show on dashboard */}
+          {activeTab === 'dashboard' && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card className="border border-blue-200 bg-blue-50 hover:shadow-lg hover:-translate-y-1 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-blue-900">
+                    <Users className="w-5 h-5 text-blue-600" />
+                    Total Users
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-black text-blue-900" data-testid="admin-total-users">
+                    {dashboard?.total_users || 0}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-emerald-200 bg-emerald-50 hover:shadow-lg hover:-translate-y-1 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
+                    <Wallet className="w-5 h-5 text-emerald-600" />
+                    Total Main Wallet
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-black text-emerald-900" data-testid="admin-total-main-wallet">
+                    ₹{dashboard?.main_wallet?.toFixed(2) || '0.00'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-green-200 bg-green-50 hover:shadow-lg hover:-translate-y-1 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-green-900">
+                    <DollarSign className="w-5 h-5 text-green-600" />
+                    Total E-Wallet
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-black text-green-900" data-testid="admin-total-e-wallet">
+                    ₹{dashboard?.e_wallet?.toFixed(2) || '0.00'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-orange-200 bg-orange-50 hover:shadow-lg hover:-translate-y-1 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-orange-900">
+                    <TrendingUp className="w-5 h-5 text-orange-600" />
+                    Pending Requests
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-black text-orange-900" data-testid="admin-pending-requests">
+                    {dashboard?.pending_fund_requests || 0}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-            <Button variant="outline" size="sm" onClick={onLogout} data-testid="admin-logout-button">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+          )}
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border border-blue-200 bg-blue-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-blue-900">
-                <Users className="w-5 h-5 text-blue-600" />
-                Total Users
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-black text-blue-900" data-testid="admin-total-users">
-                {dashboard?.total_users || 0}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-emerald-200 bg-emerald-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
-                <Wallet className="w-5 h-5 text-emerald-600" />
-                Total Main Wallet
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-black text-emerald-900" data-testid="admin-total-main-wallet">
-                ₹{dashboard?.main_wallet?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-green-200 bg-green-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-green-900">
-                <DollarSign className="w-5 h-5 text-green-600" />
-                Total E-Wallet
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-black text-green-900" data-testid="admin-total-e-wallet">
-                ₹{dashboard?.e_wallet?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-orange-200 bg-orange-50 hover:shadow-lg hover:-translate-y-1 transition-all">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-orange-900">
-                <TrendingUp className="w-5 h-5 text-orange-600" />
-                Pending Requests
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-black text-orange-900" data-testid="admin-pending-requests">
-                {dashboard?.pending_fund_requests || 0}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs Section */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto bg-white border-2 border-blue-200">
-            <TabsTrigger value="dashboard" data-testid="admin-tab-dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Overview</TabsTrigger>
-            <TabsTrigger value="requests" data-testid="admin-tab-requests" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Fund Requests {pendingRequests.length > 0 && `(${pendingRequests.length})`}
-            </TabsTrigger>
-            <TabsTrigger value="users" data-testid="admin-tab-users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Users</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard">
+          {/* Dashboard Content */}
+          {activeTab === 'dashboard' && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -228,9 +223,10 @@ const AdminDashboard = ({ user, token, onLogout }) => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="requests">
+          {/* Fund Requests Tab */}
+          {activeTab === 'requests' && (
             <Card>
               <CardHeader>
                 <CardTitle>Fund Requests Management</CardTitle>
@@ -291,9 +287,20 @@ const AdminDashboard = ({ user, token, onLogout }) => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="users">
+          {/* Packages Tab */}
+          {activeTab === 'packages' && (
+            <AdminPackages token={token} />
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <AdminSettings token={token} />
+          )}
+
+          {/* Users Tab */}
+          {activeTab === 'users' && (
             <Card>
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
@@ -339,8 +346,8 @@ const AdminDashboard = ({ user, token, onLogout }) => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </div>
   );
