@@ -6,13 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Checkbox } from '../components/ui/checkbox';
 import { toast } from 'sonner';
 import { 
-  Wallet, ArrowRightLeft, Smartphone, Tv, Lightbulb, ShoppingBag, 
-  TrendingUp, Users, LogOut, DollarSign, Plus, History
+  Wallet, ArrowRightLeft, Smartphone, History, Coins, ShoppingBag,
+  TrendingUp, Users, LogOut, DollarSign, Plus
 } from 'lucide-react';
 import WalletCards from '../components/WalletCards';
 import IncomeStats from '../components/IncomeStats';
+import Sidebar from '../components/Sidebar';
+import PackagesTab from '../components/PackagesTab';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -33,7 +36,8 @@ const UserDashboard = ({ user, token, onLogout }) => {
     service_type: 'mobile',
     number: '',
     amount: '',
-    operator: ''
+    operator: '',
+    use_coins: false
   });
 
   const axiosConfig = { headers: { Authorization: `Bearer ${token}` } };
@@ -149,7 +153,7 @@ const UserDashboard = ({ user, token, onLogout }) => {
         amount: parseFloat(rechargeData.amount)
       }, axiosConfig);
       toast.success('Recharge successful');
-      setRechargeData({ service_type: 'mobile', number: '', amount: '', operator: '' });
+      setRechargeData({ service_type: 'mobile', number: '', amount: '', operator: '', use_coins: false });
       fetchDashboard();
       fetchTransactions();
     } catch (error) {
@@ -181,28 +185,30 @@ const UserDashboard = ({ user, token, onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Wallet className="w-8 h-8 text-emerald-600" />
-            <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Smartpay360
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden md:block">
-              <p className="text-sm text-slate-600">{user.full_name}</p>
-              <p className="text-xs text-slate-500">{user.mobile}</p>
+    <div className="min-h-screen bg-slate-50 flex">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} userType="user" />
+      
+      <div className="flex-1 md:ml-64">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-slate-200/40">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Wallet className="w-8 h-8 text-purple-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Smartpay360
+                </h1>
+                <p className="text-xs text-slate-500">{user.full_name}</p>
+              </div>
             </div>
-            <Button variant="outline" size="sm" onClick={onLogout} data-testid="logout-button">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-md">
+                <Coins className="w-5 h-5 text-yellow-600" />
+                <span className="font-bold text-yellow-700" data-testid="user-coins">{user.coins || 0}</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Wallet Cards */}
