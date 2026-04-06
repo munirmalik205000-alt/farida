@@ -104,35 +104,40 @@ const AdminDashboard = ({ user, token, onLogout }) => {
   const pendingRequests = fundRequests.filter(req => req.status === 'pending');
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} userType="admin" />
       
-      <div className="flex-1 md:ml-64">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-slate-200/40">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Shield className="w-8 h-8 text-purple-600" />
+      <div className="flex-1 md:ml-72">
+        {/* Header - Desktop Optimized */}
+        <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-purple-100 shadow-sm">
+          <div className="px-8 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Shield className="w-10 h-10 text-purple-600" />
               <div>
-                <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  Admin Panel
+                <h1 className="text-xl font-bold text-slate-800" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Admin Control Panel
                 </h1>
-                <p className="text-xs text-slate-500">Smartpay360 Management</p>
+                <p className="text-sm text-slate-500">Manage platform and users</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right hidden md:block">
-                <p className="text-sm text-slate-600">{user.full_name}</p>
-                <p className="text-xs text-purple-600 font-medium">Administrator</p>
+              <div className="hidden lg:flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">{user.full_name}</p>
+                  <p className="text-xs text-purple-600 font-medium">Administrator</p>
+                </div>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="px-8 py-8">
           {/* Stats Grid - Only show on dashboard */}
           {activeTab === 'dashboard' && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
               <Card className="border border-blue-200 bg-blue-50 hover:shadow-lg hover:-translate-y-1 transition-all">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center gap-2 text-blue-900">

@@ -189,37 +189,50 @@ const UserDashboard = ({ user, token, onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-50 flex">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} userType="user" />
       
-      <div className="flex-1 md:ml-64">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-slate-200/40">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Wallet className="w-8 h-8 text-purple-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  Smartpay360
+      <div className="flex-1 md:ml-72">
+        {/* Header - Desktop Optimized */}
+        <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-purple-100 shadow-sm">
+          <div className="px-8 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="hidden md:block">
+                <h1 className="text-xl font-bold text-slate-800" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Welcome back, {user.full_name}
                 </h1>
-                <p className="text-xs text-slate-500">{user.full_name}</p>
+                <p className="text-sm text-slate-500">Manage your wallet and earnings</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-md">
-                <Coins className="w-5 h-5 text-yellow-600" />
-                <span className="font-bold text-yellow-700" data-testid="user-coins">{user.coins || 0}</span>
+            <div className="flex items-center gap-6">
+              {/* Coin Balance */}
+              <div className="flex items-center gap-3 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 px-5 py-3 rounded-xl shadow-sm">
+                <Coins className="w-6 h-6 text-yellow-600" />
+                <div>
+                  <p className="text-xs text-yellow-700 font-medium">Your Coins</p>
+                  <p className="text-2xl font-black text-yellow-800" data-testid="user-coins">{user.coins || 0}</p>
+                </div>
+              </div>
+              {/* User Info */}
+              <div className="hidden lg:flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  {user.full_name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">{user.full_name}</p>
+                  <p className="text-xs text-slate-500">{user.mobile}</p>
+                </div>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="px-8 py-8">
           {/* Wallet Cards */}
           <WalletCards dashboard={dashboard} />
 
           {/* Income Stats - Professional Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <Card className="border border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-xl transition-all">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2 text-purple-900">
