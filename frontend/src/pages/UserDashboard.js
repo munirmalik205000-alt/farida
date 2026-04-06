@@ -2,18 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Checkbox } from '../components/ui/checkbox';
 import { toast } from 'sonner';
 import { 
   Wallet, ArrowRightLeft, Smartphone, History, Coins, ShoppingBag,
-  TrendingUp, Users, LogOut, DollarSign, Plus
+  TrendingUp, Users, DollarSign, Plus, Package, GitBranch, Banknote, Settings
 } from 'lucide-react';
 import WalletCards from '../components/WalletCards';
-import IncomeStats from '../components/IncomeStats';
 import Sidebar from '../components/Sidebar';
 import PackagesTab from '../components/PackagesTab';
 
@@ -46,8 +43,6 @@ const UserDashboard = ({ user, token, onLogout }) => {
     try {
       const response = await axios.get(`${API}/user/dashboard`, axiosConfig);
       setDashboard(response.data);
-      
-      // Fetch downline count for total users stat
       const downlineResponse = await axios.get(`${API}/mlm/downline`, axiosConfig);
       setDashboard(prev => ({ ...prev, total_users: downlineResponse.data.length }));
     } catch (error) {
@@ -181,19 +176,43 @@ const UserDashboard = ({ user, token, onLogout }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="mt-4 text-slate-600">Loading...</p>
         </div>
       </div>
     );
   }
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardSection dashboard={dashboard} user={user} transactions={transactions} />;
+      case 'packages':
+        return <PackagesTab token={token} user={user} onPurchaseSuccess={fetchDashboard} />;
+      case 'transactions':
+        return <TransactionsSection transactions={transactions} />;
+      case 'recharge':
+        return <RechargeSection rechargeData={rechargeData} setRechargeData={setRechargeData} handleRecharge={handleRecharge} />;
+      case 'user-tree':
+        return <UserTreeSection downline={downline} commissions={commissions} />;
+      case 'ecommerce':
+        return <EcommerceSection products={products} orders={orders} handlePurchase={handlePurchase} />;
+      case 'withdrawal':
+        return <WithdrawalSection token={token} />;
+      case 'add-fund':
+        return <AddFundSection fundAmount={fundAmount} setFundAmount={setFundAmount} handleFundRequest={handleFundRequest} fundRequests={fundRequests} transferData={transferData} setTransferData={setTransferData} handleTransfer={handleTransfer} />;
+      case 'settings':
+        return <SettingsSection user={user} />;
+      default:
+        return <DashboardSection dashboard={dashboard} user={user} transactions={transactions} />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-50 flex">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} userType="user" />
       
       <div className="flex-1 md:ml-72">
-        {/* Header - Desktop Optimized */}
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-purple-100 shadow-sm">
           <div className="px-8 py-5 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -205,15 +224,13 @@ const UserDashboard = ({ user, token, onLogout }) => {
               </div>
             </div>
             <div className="flex items-center gap-6">
-              {/* Coin Balance */}
-              <div className="flex items-center gap-3 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 px-5 py-3 rounded-xl shadow-sm">
-                <Coins className="w-6 h-6 text-yellow-600" />
+              <div className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 px-5 py-3 rounded-xl shadow-sm">
+                <Coins className="w-6 h-6 text-purple-600" />
                 <div>
-                  <p className="text-xs text-yellow-700 font-medium">Your Coins</p>
-                  <p className="text-2xl font-black text-yellow-800" data-testid="user-coins">{user.coins || 0}</p>
+                  <p className="text-xs text-purple-700 font-medium">Your Coins</p>
+                  <p className="text-2xl font-black text-purple-800" data-testid="user-coins">{user.coins || 0}</p>
                 </div>
               </div>
-              {/* User Info */}
               <div className="hidden lg:flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-lg shadow-lg">
                   {user.full_name.charAt(0).toUpperCase()}
@@ -228,10 +245,8 @@ const UserDashboard = ({ user, token, onLogout }) => {
         </header>
 
         <div className="px-8 py-8">
-          {/* Wallet Cards */}
           <WalletCards dashboard={dashboard} />
 
-          {/* Income Stats - Professional Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <Card className="border border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-xl transition-all">
               <CardHeader className="pb-3">
@@ -242,7 +257,7 @@ const UserDashboard = ({ user, token, onLogout }) => {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-black text-purple-900" data-testid="total-income">
-                  ₹{dashboard?.total_income?.toFixed(2) || '0.00'}
+                  {dashboard?.total_income?.toFixed(2) || '0.00'}
                 </p>
               </CardContent>
             </Card>
@@ -256,7 +271,7 @@ const UserDashboard = ({ user, token, onLogout }) => {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-black text-blue-900" data-testid="today-income">
-                  ₹{dashboard?.today_income?.toFixed(2) || '0.00'}
+                  {dashboard?.today_income?.toFixed(2) || '0.00'}
                 </p>
               </CardContent>
             </Card>
@@ -270,408 +285,550 @@ const UserDashboard = ({ user, token, onLogout }) => {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-black text-emerald-900" data-testid="repurchase-income">
-                  ₹{dashboard?.repurchase_income?.toFixed(2) || '0.00'}
+                  {dashboard?.repurchase_income?.toFixed(2) || '0.00'}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-xl transition-all">
+            <Card className="border border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-xl transition-all">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2 text-orange-900">
-                  <Users className="w-5 h-5 text-orange-600" />
+                <CardTitle className="text-base flex items-center gap-2 text-blue-900">
+                  <Users className="w-5 h-5 text-blue-600" />
                   Total Users
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-black text-orange-900" data-testid="total-users-count">
+                <p className="text-3xl font-black text-blue-900" data-testid="total-users-count">
                   {dashboard?.total_users || 0}
                 </p>
               </CardContent>
             </Card>
           </div>
 
-        {/* Tabs Section */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto bg-white border-2 border-blue-200">
-            <TabsTrigger value="dashboard" data-testid="tab-dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Dashboard</TabsTrigger>
-            <TabsTrigger value="wallet" data-testid="tab-wallet" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Wallet</TabsTrigger>
-            <TabsTrigger value="recharge" data-testid="tab-recharge" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Recharge</TabsTrigger>
-            <TabsTrigger value="ecommerce" data-testid="tab-ecommerce" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">E-commerce</TabsTrigger>
-            <TabsTrigger value="mlm" data-testid="tab-mlm" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">MLM</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard">
-            <div className="grid gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Referral Code</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 p-4 bg-blue-50 rounded-md border-2 border-blue-300">
-                      <p className="text-3xl font-bold text-blue-900 tracking-wider" data-testid="referral-code">
-                        {user.referral_code}
-                      </p>
-                    </div>
-                    <Button 
-                      onClick={async () => {
-                        try {
-                          if (navigator.clipboard && window.isSecureContext) {
-                            await navigator.clipboard.writeText(user.referral_code);
-                            toast.success('Referral code copied!');
-                          } else {
-                            const textArea = document.createElement('textarea');
-                            textArea.value = user.referral_code;
-                            textArea.style.position = 'fixed';
-                            textArea.style.left = '-999999px';
-                            document.body.appendChild(textArea);
-                            textArea.focus();
-                            textArea.select();
-                            try {
-                              document.execCommand('copy');
-                              toast.success('Referral code copied!');
-                            } catch (err) {
-                              toast.info(`Code: ${user.referral_code}`);
-                            }
-                            document.body.removeChild(textArea);
-                          }
-                        } catch (err) {
-                          toast.info(`Your referral code: ${user.referral_code}`);
-                        }
-                      }}
-                      data-testid="copy-referral-button"
-                    >
-                      Copy Code
-                    </Button>
-                  </div>
-                  <p className="text-sm text-slate-600 mt-3">Share this code with friends to earn commissions</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <History className="w-5 h-5" />
-                    Recent Transactions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {transactions.length === 0 ? (
-                    <p className="text-slate-500 text-center py-8">No transactions yet</p>
-                  ) : (
-                    <div className="space-y-3" data-testid="transactions-list">
-                      {transactions.slice(0, 5).map((txn) => (
-                        <div key={txn.id} className="flex items-center justify-between p-3 border rounded-md">
-                          <div>
-                            <p className="font-medium text-slate-900">{txn.description}</p>
-                            <p className="text-sm text-slate-500">{new Date(txn.created_at).toLocaleDateString()}</p>
-                          </div>
-                          <p className="text-lg font-bold text-emerald-600">₹{txn.amount.toFixed(2)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="wallet">
-            <div className="grid gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Add Fund Request
-                  </CardTitle>
-                  <CardDescription>Submit a request to add funds to your Main Wallet</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleFundRequest} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Amount (₹)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="Enter amount"
-                        value={fundAmount}
-                        onChange={(e) => setFundAmount(e.target.value)}
-                        required
-                        data-testid="fund-amount-input"
-                      />
-                    </div>
-                    <Button type="submit" data-testid="fund-request-submit">Submit Request</Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Fund Request History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {fundRequests.length === 0 ? (
-                    <p className="text-slate-500 text-center py-8">No fund requests yet</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {fundRequests.map((req) => (
-                        <div key={req.id} className="flex items-center justify-between p-3 border rounded-md">
-                          <div>
-                            <p className="font-medium">₹{req.amount.toFixed(2)}</p>
-                            <p className="text-sm text-slate-500">{new Date(req.created_at).toLocaleDateString()}</p>
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            req.status === 'approved' ? 'bg-green-100 text-green-700' :
-                            req.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                            'bg-yellow-100 text-yellow-700'
-                          }`}>
-                            {req.status}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ArrowRightLeft className="w-5 h-5" />
-                    Transfer E-Wallet
-                  </CardTitle>
-                  <CardDescription>Transfer funds to another user's E-Wallet</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleTransfer} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Recipient Mobile Number</Label>
-                      <Input
-                        type="tel"
-                        placeholder="Enter mobile number"
-                        value={transferData.mobile}
-                        onChange={(e) => setTransferData({ ...transferData, mobile: e.target.value })}
-                        required
-                        data-testid="transfer-mobile-input"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Amount (₹)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="Enter amount"
-                        value={transferData.amount}
-                        onChange={(e) => setTransferData({ ...transferData, amount: e.target.value })}
-                        required
-                        data-testid="transfer-amount-input"
-                      />
-                    </div>
-                    <Button type="submit" data-testid="transfer-submit">Transfer</Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="recharge">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Smartphone className="w-5 h-5" />
-                  Recharge Services
-                </CardTitle>
-                <CardDescription>Recharge mobile, DTH, or pay utility bills</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleRecharge} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Service Type</Label>
-                    <Select 
-                      value={rechargeData.service_type}
-                      onValueChange={(value) => setRechargeData({ ...rechargeData, service_type: value })}
-                    >
-                      <SelectTrigger data-testid="recharge-service-select">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="mobile">Mobile Recharge</SelectItem>
-                        <SelectItem value="dth">DTH Recharge</SelectItem>
-                        <SelectItem value="electricity">Electricity Bill</SelectItem>
-                        <SelectItem value="gas">Gas Bill</SelectItem>
-                        <SelectItem value="water">Water Bill</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Number / Account ID</Label>
-                    <Input
-                      type="text"
-                      placeholder="Enter number or account ID"
-                      value={rechargeData.number}
-                      onChange={(e) => setRechargeData({ ...rechargeData, number: e.target.value })}
-                      required
-                      data-testid="recharge-number-input"
-                    />
-                  </div>
-                  {rechargeData.service_type === 'mobile' && (
-                    <div className="space-y-2">
-                      <Label>Operator (Optional)</Label>
-                      <Input
-                        type="text"
-                        placeholder="e.g., Airtel, Jio, Vi"
-                        value={rechargeData.operator}
-                        onChange={(e) => setRechargeData({ ...rechargeData, operator: e.target.value })}
-                        data-testid="recharge-operator-input"
-                      />
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <Label>Amount (₹)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="Enter amount"
-                      value={rechargeData.amount}
-                      onChange={(e) => setRechargeData({ ...rechargeData, amount: e.target.value })}
-                      required
-                      data-testid="recharge-amount-input"
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" data-testid="recharge-submit">
-                    Proceed to Recharge
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="packages">
-            <PackagesTab token={token} user={user} onPurchaseSuccess={fetchDashboard} />
-          </TabsContent>
-
-          <TabsContent value="ecommerce">
-            <div className="grid gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <Card key={product.id} className="overflow-hidden">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <CardHeader>
-                      <CardTitle className="text-lg">{product.name}</CardTitle>
-                      <CardDescription>{product.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <p className="text-2xl font-bold text-emerald-600">₹{product.price.toFixed(2)}</p>
-                        <Button 
-                          onClick={() => handlePurchase(product.id)}
-                          disabled={product.stock === 0}
-                          data-testid={`buy-product-${product.id}`}
-                        >
-                          {product.stock === 0 ? 'Out of Stock' : 'Buy Now'}
-                        </Button>
-                      </div>
-                      <p className="text-sm text-slate-500 mt-2">Stock: {product.stock}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>My Orders</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {orders.length === 0 ? (
-                    <p className="text-slate-500 text-center py-8">No orders yet</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {orders.map((order) => (
-                        <div key={order.id} className="flex items-center justify-between p-3 border rounded-md">
-                          <div>
-                            <p className="font-medium">{order.product_name}</p>
-                            <p className="text-sm text-slate-500">
-                              {new Date(order.created_at).toLocaleDateString()} • Qty: {order.quantity}
-                            </p>
-                          </div>
-                          <p className="text-lg font-bold text-emerald-600">₹{order.amount.toFixed(2)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="mlm">
-            <div className="grid gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    My Downline ({downline.length})
-                  </CardTitle>
-                  <CardDescription>Users registered under your referral</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {downline.length === 0 ? (
-                    <p className="text-slate-500 text-center py-8">No downline users yet</p>
-                  ) : (
-                    <div className="space-y-3" data-testid="downline-list">
-                      {downline.map((user) => (
-                        <div key={user.id} className="flex items-center justify-between p-4 border rounded-md">
-                          <div>
-                            <p className="font-medium text-slate-900">{user.full_name}</p>
-                            <p className="text-sm text-slate-500">{user.mobile}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-emerald-600">Level {user.level}</p>
-                            <p className="text-xs text-slate-500">{new Date(user.created_at).toLocaleDateString()}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Commission History</CardTitle>
-                  <CardDescription>Your earnings from downline activities</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {commissions.length === 0 ? (
-                    <p className="text-slate-500 text-center py-8">No commissions yet</p>
-                  ) : (
-                    <div className="space-y-3" data-testid="commissions-list">
-                      {commissions.map((commission) => (
-                        <div key={commission.id} className="flex items-center justify-between p-3 border rounded-md">
-                          <div>
-                            <p className="font-medium text-slate-900">From: {commission.from_user_name}</p>
-                            <p className="text-sm text-slate-500">
-                              Level {commission.level} • {commission.type} • {new Date(commission.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <p className="text-lg font-bold text-emerald-600">₹{commission.amount.toFixed(2)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+          {renderContent()}
         </div>
       </div>
     </div>
   );
 };
+
+/* ========== Dashboard Section ========== */
+const DashboardSection = ({ dashboard, user, transactions }) => (
+  <div className="grid gap-6" data-testid="dashboard-section">
+    <Card>
+      <CardHeader>
+        <CardTitle>Your Referral Code</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 p-4 bg-blue-50 rounded-md border-2 border-blue-300">
+            <p className="text-3xl font-bold text-blue-900 tracking-wider" data-testid="referral-code">
+              {user.referral_code}
+            </p>
+          </div>
+          <Button 
+            onClick={async () => {
+              try {
+                if (navigator.clipboard && window.isSecureContext) {
+                  await navigator.clipboard.writeText(user.referral_code);
+                  toast.success('Referral code copied!');
+                } else {
+                  const textArea = document.createElement('textarea');
+                  textArea.value = user.referral_code;
+                  textArea.style.position = 'fixed';
+                  textArea.style.left = '-999999px';
+                  document.body.appendChild(textArea);
+                  textArea.focus();
+                  textArea.select();
+                  document.execCommand('copy');
+                  toast.success('Referral code copied!');
+                  document.body.removeChild(textArea);
+                }
+              } catch (err) {
+                toast.info(`Your referral code: ${user.referral_code}`);
+              }
+            }}
+            data-testid="copy-referral-button"
+          >
+            Copy Code
+          </Button>
+        </div>
+        <p className="text-sm text-slate-600 mt-3">Share this code with friends to earn commissions</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <History className="w-5 h-5" />
+          Recent Transactions
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {transactions.length === 0 ? (
+          <p className="text-slate-500 text-center py-8">No transactions yet</p>
+        ) : (
+          <div className="space-y-3" data-testid="transactions-list">
+            {transactions.slice(0, 5).map((txn) => (
+              <div key={txn.id} className="flex items-center justify-between p-3 border rounded-md">
+                <div>
+                  <p className="font-medium text-slate-900">{txn.description}</p>
+                  <p className="text-sm text-slate-500">{new Date(txn.created_at).toLocaleDateString()}</p>
+                </div>
+                <p className="text-lg font-bold text-emerald-600">{txn.amount.toFixed(2)}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ========== Transactions Section ========== */
+const TransactionsSection = ({ transactions }) => (
+  <div className="grid gap-6" data-testid="transactions-section">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ArrowRightLeft className="w-5 h-5 text-purple-600" />
+          All Transactions
+        </CardTitle>
+        <CardDescription>Complete history of all your transactions</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {transactions.length === 0 ? (
+          <p className="text-slate-500 text-center py-8">No transactions yet</p>
+        ) : (
+          <div className="space-y-3" data-testid="all-transactions-list">
+            {transactions.map((txn) => (
+              <div key={txn.id} className="flex items-center justify-between p-4 border border-purple-100 rounded-xl hover:shadow-md transition-all">
+                <div>
+                  <p className="font-semibold text-slate-900">{txn.description}</p>
+                  <p className="text-sm text-slate-500">{new Date(txn.created_at).toLocaleDateString()}</p>
+                  <span className={`inline-block mt-1 px-2 py-0.5 text-xs rounded-full font-medium ${
+                    txn.type === 'credit' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                  }`}>{txn.type || 'transaction'}</span>
+                </div>
+                <p className={`text-xl font-black ${txn.type === 'credit' ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {txn.type === 'credit' ? '+' : '-'}{txn.amount.toFixed(2)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ========== Recharge Section ========== */
+const RechargeSection = ({ rechargeData, setRechargeData, handleRecharge }) => (
+  <div data-testid="recharge-section">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Smartphone className="w-5 h-5 text-purple-600" />
+          Recharge Services
+        </CardTitle>
+        <CardDescription>Recharge mobile, DTH, or pay utility bills</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleRecharge} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Service Type</Label>
+            <Select 
+              value={rechargeData.service_type}
+              onValueChange={(value) => setRechargeData({ ...rechargeData, service_type: value })}
+            >
+              <SelectTrigger data-testid="recharge-service-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mobile">Mobile Recharge</SelectItem>
+                <SelectItem value="dth">DTH Recharge</SelectItem>
+                <SelectItem value="electricity">Electricity Bill</SelectItem>
+                <SelectItem value="gas">Gas Bill</SelectItem>
+                <SelectItem value="water">Water Bill</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Number / Account ID</Label>
+            <Input
+              type="text"
+              placeholder="Enter number or account ID"
+              value={rechargeData.number}
+              onChange={(e) => setRechargeData({ ...rechargeData, number: e.target.value })}
+              required
+              data-testid="recharge-number-input"
+            />
+          </div>
+          {rechargeData.service_type === 'mobile' && (
+            <div className="space-y-2">
+              <Label>Operator (Optional)</Label>
+              <Input
+                type="text"
+                placeholder="e.g., Airtel, Jio, Vi"
+                value={rechargeData.operator}
+                onChange={(e) => setRechargeData({ ...rechargeData, operator: e.target.value })}
+                data-testid="recharge-operator-input"
+              />
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label>Amount</Label>
+            <Input
+              type="number"
+              step="0.01"
+              placeholder="Enter amount"
+              value={rechargeData.amount}
+              onChange={(e) => setRechargeData({ ...rechargeData, amount: e.target.value })}
+              required
+              data-testid="recharge-amount-input"
+            />
+          </div>
+          <Button type="submit" className="w-full" data-testid="recharge-submit">
+            Proceed to Recharge
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ========== User Tree (MLM Downline) Section ========== */
+const UserTreeSection = ({ downline, commissions }) => (
+  <div className="grid gap-6" data-testid="user-tree-section">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <GitBranch className="w-5 h-5 text-purple-600" />
+          My Downline ({downline.length})
+        </CardTitle>
+        <CardDescription>Users registered under your referral</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {downline.length === 0 ? (
+          <p className="text-slate-500 text-center py-8">No downline users yet</p>
+        ) : (
+          <div className="space-y-3" data-testid="downline-list">
+            {downline.map((u) => (
+              <div key={u.id} className="flex items-center justify-between p-4 border border-purple-100 rounded-xl hover:shadow-md transition-all">
+                <div>
+                  <p className="font-semibold text-slate-900">{u.full_name}</p>
+                  <p className="text-sm text-slate-500">{u.mobile}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-purple-600">Level {u.level}</p>
+                  <p className="text-xs text-slate-500">{new Date(u.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-emerald-600" />
+          Commission History
+        </CardTitle>
+        <CardDescription>Your earnings from downline activities</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {commissions.length === 0 ? (
+          <p className="text-slate-500 text-center py-8">No commissions yet</p>
+        ) : (
+          <div className="space-y-3" data-testid="commissions-list">
+            {commissions.map((commission) => (
+              <div key={commission.id} className="flex items-center justify-between p-3 border rounded-md">
+                <div>
+                  <p className="font-medium text-slate-900">From: {commission.from_user_name}</p>
+                  <p className="text-sm text-slate-500">
+                    Level {commission.level} - {commission.type} - {new Date(commission.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <p className="text-lg font-bold text-emerald-600">{commission.amount.toFixed(2)}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ========== E-commerce Section ========== */
+const EcommerceSection = ({ products, orders, handlePurchase }) => (
+  <div className="grid gap-6" data-testid="ecommerce-section">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {products.map((product) => (
+        <Card key={product.id} className="overflow-hidden">
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="w-full h-48 object-cover"
+          />
+          <CardHeader>
+            <CardTitle className="text-lg">{product.name}</CardTitle>
+            <CardDescription>{product.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <p className="text-2xl font-bold text-emerald-600">{product.price.toFixed(2)}</p>
+              <Button 
+                onClick={() => handlePurchase(product.id)}
+                disabled={product.stock === 0}
+                data-testid={`buy-product-${product.id}`}
+              >
+                {product.stock === 0 ? 'Out of Stock' : 'Buy Now'}
+              </Button>
+            </div>
+            <p className="text-sm text-slate-500 mt-2">Stock: {product.stock}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>My Orders</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {orders.length === 0 ? (
+          <p className="text-slate-500 text-center py-8">No orders yet</p>
+        ) : (
+          <div className="space-y-3">
+            {orders.map((order) => (
+              <div key={order.id} className="flex items-center justify-between p-3 border rounded-md">
+                <div>
+                  <p className="font-medium">{order.product_name}</p>
+                  <p className="text-sm text-slate-500">
+                    {new Date(order.created_at).toLocaleDateString()} - Qty: {order.quantity}
+                  </p>
+                </div>
+                <p className="text-lg font-bold text-emerald-600">{order.amount.toFixed(2)}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ========== Withdrawal Section ========== */
+const WithdrawalSection = ({ token }) => {
+  const [amount, setAmount] = useState('');
+  const [method, setMethod] = useState('bank');
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/wallet/withdrawal`, { amount: parseFloat(amount), method }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Withdrawal request submitted!');
+      setAmount('');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Withdrawal request failed');
+    }
+  };
+
+  return (
+    <div data-testid="withdrawal-section">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Banknote className="w-5 h-5 text-purple-600" />
+            Withdrawal Money
+          </CardTitle>
+          <CardDescription>Request withdrawal from your Main Wallet</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleWithdraw} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Withdrawal Method</Label>
+              <Select value={method} onValueChange={setMethod}>
+                <SelectTrigger data-testid="withdrawal-method-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bank">Bank Transfer</SelectItem>
+                  <SelectItem value="upi">UPI</SelectItem>
+                  <SelectItem value="paytm">Paytm Wallet</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Amount</Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="Enter amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+                data-testid="withdrawal-amount-input"
+              />
+            </div>
+            <Button type="submit" className="w-full" data-testid="withdrawal-submit">
+              Submit Withdrawal Request
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+/* ========== Add Fund Section ========== */
+const AddFundSection = ({ fundAmount, setFundAmount, handleFundRequest, fundRequests, transferData, setTransferData, handleTransfer }) => (
+  <div className="grid gap-6" data-testid="add-fund-section">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Plus className="w-5 h-5 text-purple-600" />
+          Add Fund Request
+        </CardTitle>
+        <CardDescription>Submit a request to add funds to your Main Wallet</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleFundRequest} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Amount</Label>
+            <Input
+              type="number"
+              step="0.01"
+              placeholder="Enter amount"
+              value={fundAmount}
+              onChange={(e) => setFundAmount(e.target.value)}
+              required
+              data-testid="fund-amount-input"
+            />
+          </div>
+          <Button type="submit" data-testid="fund-request-submit">Submit Request</Button>
+        </form>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Fund Request History</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {fundRequests.length === 0 ? (
+          <p className="text-slate-500 text-center py-8">No fund requests yet</p>
+        ) : (
+          <div className="space-y-3" data-testid="fund-requests-list">
+            {fundRequests.map((req) => (
+              <div key={req.id} className="flex items-center justify-between p-3 border rounded-md">
+                <div>
+                  <p className="font-medium">{req.amount.toFixed(2)}</p>
+                  <p className="text-sm text-slate-500">{new Date(req.created_at).toLocaleDateString()}</p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  req.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                  req.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                  'bg-purple-100 text-purple-700'
+                }`}>
+                  {req.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ArrowRightLeft className="w-5 h-5 text-purple-600" />
+          Transfer E-Wallet
+        </CardTitle>
+        <CardDescription>Transfer funds to another user's E-Wallet</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleTransfer} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Recipient Mobile Number</Label>
+            <Input
+              type="tel"
+              placeholder="Enter mobile number"
+              value={transferData.mobile}
+              onChange={(e) => setTransferData({ ...transferData, mobile: e.target.value })}
+              required
+              data-testid="transfer-mobile-input"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Amount</Label>
+            <Input
+              type="number"
+              step="0.01"
+              placeholder="Enter amount"
+              value={transferData.amount}
+              onChange={(e) => setTransferData({ ...transferData, amount: e.target.value })}
+              required
+              data-testid="transfer-amount-input"
+            />
+          </div>
+          <Button type="submit" data-testid="transfer-submit">Transfer</Button>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ========== Settings Section ========== */
+const SettingsSection = ({ user }) => (
+  <div data-testid="settings-section">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="w-5 h-5 text-purple-600" />
+          Account Settings
+        </CardTitle>
+        <CardDescription>Your profile information</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 border border-purple-100 rounded-xl">
+              <p className="text-sm text-slate-500">Full Name</p>
+              <p className="text-lg font-semibold text-slate-900">{user.full_name}</p>
+            </div>
+            <div className="p-4 border border-purple-100 rounded-xl">
+              <p className="text-sm text-slate-500">Mobile</p>
+              <p className="text-lg font-semibold text-slate-900">{user.mobile}</p>
+            </div>
+            <div className="p-4 border border-purple-100 rounded-xl">
+              <p className="text-sm text-slate-500">Email</p>
+              <p className="text-lg font-semibold text-slate-900">{user.email || 'Not set'}</p>
+            </div>
+            <div className="p-4 border border-purple-100 rounded-xl">
+              <p className="text-sm text-slate-500">Referral Code</p>
+              <p className="text-lg font-semibold text-purple-700">{user.referral_code}</p>
+            </div>
+            <div className="p-4 border border-purple-100 rounded-xl">
+              <p className="text-sm text-slate-500">Account Status</p>
+              <p className={`text-lg font-semibold ${user.is_activated ? 'text-emerald-600' : 'text-red-600'}`}>
+                {user.is_activated ? 'Activated' : 'Not Activated'}
+              </p>
+            </div>
+            <div className="p-4 border border-purple-100 rounded-xl">
+              <p className="text-sm text-slate-500">Coins</p>
+              <p className="text-lg font-semibold text-purple-700">{user.coins || 0}</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
 
 export default UserDashboard;

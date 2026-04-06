@@ -198,6 +198,10 @@ class WalletTransferRequest(BaseModel):
     to_user_mobile: str
     amount: float
 
+class WithdrawalRequest(BaseModel):
+    amount: float
+    method: str = 'bank'
+
 @api_router.post('/auth/signup', response_model=AuthResponse)
 async def signup(req: SignupRequest):
     existing = await db.users.find_one({'mobile': req.mobile})
@@ -285,6 +289,41 @@ async def create_fund_request(req: FundRequestCreate, current_user: dict = Depen
 async def get_user_fund_requests(current_user: dict = Depends(get_current_user)):
     requests = await db.fund_requests.find({'user_id': current_user['id']}, {'_id': 0}).to_list(None)
     return requests
+
+@api_router.post('/wallet/withdrawal')
+async def create_withdrawal(req: WithdrawalRequest, current_user: dict = Depends(get_current_user)):
+    if req.amount <= 0:
+        raise HTTPException(status_code=400, detail='Amount must be greater than 0')
+    if current_user['main_wallet'] < req.amount:
+        raise HTTPException(status_code=400, detail='Insufficient Main Wallet balance')
+    
+    withdrawal_doc = {
+        'id': str(uuid.uuid4()),
+        'user_id': current_user['id'],
+        'user_name': current_user['full_name'],
+        'user_mobile': current_user['mobile'],
+        'amount': req.amount,
+        'method': req.method,
+        'status': 'pending',
+        'created_at': datetime.now(timezone.utc).isoformat()
+    }
+    await db.withdrawals.insert_one(withdrawal_doc)
+    
+    transaction_doc = {
+        'id': str(uuid.uuid4()),
+        'user_id': current_user['id'],
+        'user_name': current_user['full_name'],
+        'type': 'withdrawal',
+        'amount': req.amount,
+        'from_wallet': 'main_wallet',
+        'to_wallet': None,
+        'status': 'pending',
+        'description': f'Withdrawal request via {req.method} - {req.amount}',
+        'created_at': datetime.now(timezone.utc).isoformat()
+    }
+    await db.transactions.insert_one(transaction_doc)
+    
+    return {'message': 'Withdrawal request submitted successfully', 'withdrawal_id': withdrawal_doc['id']}
 
 @api_router.post('/wallet/transfer')
 async def transfer_wallet(req: WalletTransferRequest, current_user: dict = Depends(get_current_user)):

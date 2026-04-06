@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { Menu, X, Home, Wallet, Smartphone, ShoppingBag, Users, Settings, LogOut } from 'lucide-react';
-import { Button } from './ui/button';
+import { Menu, X, Home, Wallet, Smartphone, ShoppingBag, Users, Settings, LogOut, Package, ArrowRightLeft, GitBranch, CreditCard, PlusCircle, Banknote } from 'lucide-react';
 
 const Sidebar = ({ activeTab, setActiveTab, onLogout, userType = 'user' }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const userMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'wallet', label: 'Wallet', icon: Wallet },
+    { id: 'packages', label: 'Package', icon: Package },
+    { id: 'transactions', label: 'Transaction', icon: ArrowRightLeft },
     { id: 'recharge', label: 'Recharge', icon: Smartphone },
+    { id: 'user-tree', label: 'User Tree', icon: GitBranch },
+    { id: 'ecommerce', label: 'E-commerce', icon: ShoppingBag },
+    { id: 'withdrawal', label: 'Withdrawal Money', icon: Banknote },
+    { id: 'add-fund', label: 'Add Fund', icon: PlusCircle },
+    { id: 'settings', label: 'Setting', icon: Settings },
   ];
 
   const adminMenuItems = [
