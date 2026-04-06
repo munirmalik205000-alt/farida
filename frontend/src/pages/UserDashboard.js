@@ -473,6 +473,10 @@ const UserDashboard = ({ user, token, onLogout }) => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="packages">
+            <PackagesTab token={token} user={user} onPurchaseSuccess={fetchDashboard} />
+          </TabsContent>
+
           <TabsContent value="ecommerce">
             <div className="grid gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
