@@ -46,6 +46,10 @@ const UserDashboard = ({ user, token, onLogout }) => {
     try {
       const response = await axios.get(`${API}/user/dashboard`, axiosConfig);
       setDashboard(response.data);
+      
+      // Fetch downline count for total users stat
+      const downlineResponse = await axios.get(`${API}/mlm/downline`, axiosConfig);
+      setDashboard(prev => ({ ...prev, total_users: downlineResponse.data.length }));
     } catch (error) {
       toast.error('Failed to load dashboard');
     } finally {
@@ -214,8 +218,64 @@ const UserDashboard = ({ user, token, onLogout }) => {
           {/* Wallet Cards */}
           <WalletCards dashboard={dashboard} />
 
-          {/* Income Stats */}
-          <IncomeStats dashboard={dashboard} />
+          {/* Income Stats - Professional Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="border border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-xl transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2 text-purple-900">
+                  <TrendingUp className="w-5 h-5 text-purple-600" />
+                  Total Income
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-purple-900" data-testid="total-income">
+                  ₹{dashboard?.total_income?.toFixed(2) || '0.00'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-xl transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2 text-blue-900">
+                  <DollarSign className="w-5 h-5 text-blue-600" />
+                  Today's Income
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-blue-900" data-testid="today-income">
+                  ₹{dashboard?.today_income?.toFixed(2) || '0.00'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white hover:shadow-xl transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
+                  <ShoppingBag className="w-5 h-5 text-emerald-600" />
+                  Repurchase Income
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-emerald-900" data-testid="repurchase-income">
+                  ₹{dashboard?.repurchase_income?.toFixed(2) || '0.00'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-xl transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2 text-orange-900">
+                  <Users className="w-5 h-5 text-orange-600" />
+                  Total Users
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-orange-900" data-testid="total-users-count">
+                  {dashboard?.total_users || 0}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

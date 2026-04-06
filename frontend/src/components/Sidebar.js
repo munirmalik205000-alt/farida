@@ -9,9 +9,6 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout, userType = 'user' }) => {
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'wallet', label: 'Wallet', icon: Wallet },
     { id: 'recharge', label: 'Recharge', icon: Smartphone },
-    { id: 'packages', label: 'Packages', icon: ShoppingBag },
-    { id: 'ecommerce', label: 'E-commerce', icon: ShoppingBag },
-    { id: 'mlm', label: 'MLM', icon: Users },
   ];
 
   const adminMenuItems = [
