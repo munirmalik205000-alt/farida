@@ -164,8 +164,8 @@ const AdminPackages = ({ token }) => {
                 <div className="text-right">
                   <p className="text-slate-600">Coins</p>
                   <div className="flex items-center gap-1">
-                    <Coins className="w-4 h-4 text-yellow-500" />
-                    <p className="text-lg font-bold text-yellow-600">{pkg.coins}</p>
+                    <Coins className="w-4 h-4 text-purple-500" />
+                    <p className="text-lg font-bold text-purple-600">{pkg.coins}</p>
                   </div>
                 </div>
               </div>

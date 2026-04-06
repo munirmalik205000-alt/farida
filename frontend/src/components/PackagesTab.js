@@ -81,8 +81,8 @@ const PackagesTab = ({ token, user, onPurchaseSuccess }) => {
                 <div className="text-right">
                   <p className="text-sm text-slate-600">Coins Reward</p>
                   <div className="flex items-center gap-1">
-                    <Coins className="w-5 h-5 text-yellow-500" />
-                    <p className="text-2xl font-bold text-yellow-600">{pkg.coins}</p>
+                    <Coins className="w-5 h-5 text-purple-500" />
+                    <p className="text-2xl font-bold text-purple-600">{pkg.coins}</p>
                   </div>
                 </div>
               </div>

@@ -83,8 +83,8 @@ const CoinHistory = ({ token }) => {
                     <div>
                       <p className="text-xs text-slate-500">Coins Used</p>
                       <div className="flex items-center gap-1">
-                        <Coins className="w-4 h-4 text-yellow-500" />
-                        <p className="text-lg font-bold text-yellow-600">{recharge.coins_used}</p>
+                        <Coins className="w-4 h-4 text-purple-500" />
+                        <p className="text-lg font-bold text-purple-600">{recharge.coins_used}</p>
                       </div>
                     </div>
                     <div>

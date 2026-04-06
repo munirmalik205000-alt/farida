@@ -225,6 +225,17 @@ div[class*="bg-"] {
     background-color: transparent !important;
 }
 
+/* Force body background - override any injected yellow */
+html, body {
+    background-color: rgb(248 250 252) !important;
+}
+
+/* Kill any inline yellow styles injected by visual editor */
+body[style*="background"] {
+    background-color: rgb(248 250 252) !important;
+    background: rgb(248 250 252) !important;
+}
+
 /* Strong override for content sections */
 section,
 main,
