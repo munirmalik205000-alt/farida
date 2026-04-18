@@ -469,7 +469,7 @@ const RechargeSection = ({ rechargeData, setRechargeData, handleRecharge }) => (
               <Label>Operator (Optional)</Label>
               <Input
                 type="text"
-                placeholder="e.g., Airtel, Jio, Vi"
+                
                 value={rechargeData.operator}
                 onChange={(e) => setRechargeData({ ...rechargeData, operator: e.target.value })}
                 data-testid="recharge-operator-input"
